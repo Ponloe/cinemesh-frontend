@@ -9,20 +9,11 @@ export function Header() {
             {/* <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-orange-500 to-pink-600">
               <span className="text-lg font-bold text-white">C</span>
             </div> */}
+            <Link href="/">
             <h1 className="text-xl font-bold text-zinc-50">CineMesh</h1>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
-            <nav className="hidden gap-8 text-sm md:flex">
-              <a href="#" className="text-zinc-400 transition-colors hover:text-zinc-50">
-                Discover
-              </a>
-              <a href="#" className="text-zinc-400 transition-colors hover:text-zinc-50">
-                Popular
-              </a>
-              <a href="#" className="text-zinc-400 transition-colors hover:text-zinc-50">
-                Trending
-              </a>
-            </nav>
             <div className="flex gap-2">
               <Link href="/login">
                 <button className="bg-zinc-800 text-zinc-50 px-4 py-2 rounded-md font-medium hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500">
