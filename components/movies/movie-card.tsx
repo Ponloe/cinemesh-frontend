@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Movie } from "@/lib/mock-data";
 
 interface MovieCardProps {
@@ -7,7 +8,7 @@ interface MovieCardProps {
 
 export function MovieCard({ movie }: MovieCardProps) {
   return (
-    <div className="group relative cursor-pointer">
+    <Link href={`/movies/${movie.slug}`} className="group relative cursor-pointer block">
       <div className="aspect-2/3 overflow-hidden rounded-md bg-zinc-900 shadow-lg shadow-black/20 ring-1 ring-zinc-800 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:shadow-black/40 group-hover:ring-zinc-700">
         <Image
           src={movie.poster}
@@ -54,6 +55,6 @@ export function MovieCard({ movie }: MovieCardProps) {
         </h3>
         <p className="text-xs text-zinc-500">{movie.year}</p>
       </div>
-    </div>
+    </Link>
   );
 }
