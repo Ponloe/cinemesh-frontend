@@ -28,17 +28,17 @@ export function Header() {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
-                href="/movies"
+                href="/movie"
                 className="text-base font-medium text-zinc-300 hover:text-zinc-50 transition-colors relative group"
               >
                 Movies
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
-                href="/series"
+                href="/genre"
                 className="text-base font-medium text-zinc-300 hover:text-zinc-50 transition-colors relative group"
               >
-                Series
+                Genre
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
