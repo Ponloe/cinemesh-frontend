@@ -8,7 +8,12 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Header />
-      <Hero accentColor="rgb(220, 38, 38)" />
+      <Hero
+        title="Avatar: Fire and Ash"
+        description="Jake and Neytiri's family grapples with grief..."
+        accentColor="rgb(220, 38, 38)"
+        backgroundImage="/images/avatar.jpg"
+      />
 
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
