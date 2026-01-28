@@ -31,7 +31,7 @@ export function RegisterForm() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="mt-1 block w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          className="mt-1 block w-full px-3 py-2  border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           placeholder="Enter your name"
         />
       </div>
@@ -45,7 +45,7 @@ export function RegisterForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="mt-1 block w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          className="mt-1 block w-full px-3 py-2  border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           placeholder="Enter your email"
         />
       </div>
@@ -59,7 +59,7 @@ export function RegisterForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mt-1 block w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          className="mt-1 block w-full px-3 py-2  border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           placeholder="Enter your password"
         />
       </div>
@@ -73,19 +73,19 @@ export function RegisterForm() {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
-          className="mt-1 block w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          className="mt-1 block w-full px-3 py-2  border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           placeholder="Confirm your password"
         />
       </div>
       <button
         type="submit"
-        className="w-full bg-zinc-50 text-zinc-950 py-2 px-4 rounded-md font-semibold hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+        className="w-full bg-zinc-50 text-zinc-950 py-2 px-4 rounded-md font-semibold hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 cursor-pointer"
       >
         Register
       </button>
       <p className="text-center text-sm text-zinc-500">
         Already have an account?{" "}
-        <Link href="/login" className="text-zinc-300 hover:text-zinc-50">
+        <Link href="/login" className="text-zinc-300 hover:text-zinc-50 cursor-pointer">
           Login here
         </Link>
       </p>
