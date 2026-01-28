@@ -6,13 +6,13 @@ export function Hero({ accentColor = "rgb(220, 40, 40)" }) {
   return (
     <>
       <div 
-        className="fixed inset-0 -z-10 opacity-20 blur-3xl"
+        className="absolute top-0 left-0 right-0 h-600 -z-10 opacity-30 blur-3xl pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse at 50% 10%, ${accentColor}, transparent 60%)`
+          background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${accentColor} 0%, rgba(220, 40, 40, 0.4) 40%, transparent 80%)`
         }}
       />
       
-      <section className="mt-6 md:mt-8">
+      <section className="relative mt-6 md:mt-8">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto relative">
             <Image 

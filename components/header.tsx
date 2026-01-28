@@ -52,12 +52,12 @@ export function Header() {
 
             <div className="flex items-center gap-3">
               <Link href="/register">
-                <button className="bg-white/5 hover:bg-white/10 backdrop-blur-sm text-zinc-50 px-6 py-1 rounded-lg font-medium border border-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-200">
+                <button className="bg-white/5 hover:bg-white/10 backdrop-blur-sm text-zinc-50 px-6 py-1 rounded-lg font-medium border border-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-200 cursor-pointer">
                   Sign Up
                 </button>
               </Link>
               <Link href="/login">
-                <button className="bg-zinc-50 hover:bg-white text-zinc-950 px-6 py-1 rounded-lg font-medium shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all duration-200">
+                <button className="bg-zinc-50 hover:bg-white text-zinc-950 px-6 py-1 rounded-lg font-medium shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all duration-200 cursor-pointer">
                   Login
                 </button>
               </Link>
