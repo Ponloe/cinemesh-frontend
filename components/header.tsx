@@ -3,7 +3,7 @@ import { LogoIcon  } from "@/public/icons/cineMashLogo";
 
 export function Header() {
   return (
-    <header className="sticky top-4 z-50 px-55">
+    <header className="sticky top-4 z-50 px-70">
       <div className="container rounded-full bg-linear-to-r from-white/5 via-white/10 to-white/5 dark:from-black/5 dark:via-black/10 dark:to-black/5 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.12)]">
         <div className="px-6 py-3 md:py-3 shadow-sm max-w-5xl mx-auto w-full">
           <div className="flex items-center justify-between">
