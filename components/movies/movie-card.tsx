@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Movie } from "@/lib/mock-data";
 
 interface MovieCardProps {
@@ -7,8 +8,8 @@ interface MovieCardProps {
 
 export function MovieCard({ movie }: MovieCardProps) {
   return (
-    <div className="group relative cursor-pointer">
-      <div className="aspect-[2/3] overflow-hidden rounded-md bg-zinc-900 shadow-lg shadow-black/20 ring-1 ring-zinc-800 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:shadow-black/40 group-hover:ring-zinc-700">
+    <Link href={`/movies/${movie.slug}`} className="group relative cursor-pointer block">
+      <div className="aspect-2/3 overflow-hidden rounded-md bg-zinc-900 shadow-lg shadow-black/20 ring-1 ring-zinc-800 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:shadow-black/40 group-hover:ring-zinc-700">
         <Image
           src={movie.poster}
           alt={`${movie.title} poster`}
@@ -19,7 +20,7 @@ export function MovieCard({ movie }: MovieCardProps) {
         />
         
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <div className="mb-2 flex items-center gap-2">
               <div className="flex items-center rounded-full bg-yellow-500/20 px-2 py-1">
@@ -54,6 +55,6 @@ export function MovieCard({ movie }: MovieCardProps) {
         </h3>
         <p className="text-xs text-zinc-500">{movie.year}</p>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -25,7 +25,7 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="mt-1 block w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          className="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           placeholder="Enter your email"
         />
       </div>
@@ -39,19 +39,19 @@ export function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mt-1 block w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          className="mt-1 block w-full px-3 py-2 border border-zinc-700 rounded-md text-zinc-50 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           placeholder="Enter your password"
         />
       </div>
       <button
         type="submit"
-        className="w-full bg-zinc-50 text-zinc-950 py-2 px-4 rounded-md font-semibold hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+        className="w-full bg-zinc-50 text-zinc-950 py-2 px-4 rounded-md font-semibold hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 cursor-pointer"
       >
         Login
       </button>
       <p className="text-center text-sm text-zinc-500">
-        Don't have an account?{" "}
-        <Link href="/register" className="text-zinc-300 hover:text-zinc-50">
+        Don&apos;t have an account?{" "}
+        <Link href="/register" className="text-zinc-300 hover:text-zinc-50 cursor-pointer">
           Register here
         </Link>
       </p>

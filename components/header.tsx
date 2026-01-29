@@ -3,7 +3,7 @@ import { LogoIcon  } from "@/public/icons/cineMashLogo";
 
 export function Header() {
   return (
-    <header className="sticky top-4 z-50 px-70">
+    <header className="sticky top-8 z-50 px-70">
       <div className="container rounded-full bg-linear-to-r from-white/5 via-white/10 to-white/5 dark:from-black/5 dark:via-black/10 dark:to-black/5 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.12)]">
         <div className="px-6 py-3 md:py-3 shadow-sm max-w-5xl mx-auto w-full">
           <div className="flex items-center justify-between">
@@ -20,25 +20,25 @@ export function Header() {
             </div>
 
             <nav className="hidden md:flex items-center gap-10">
-              <Link
+              {/* <Link
                 href="/tv-series"
                 className="text-base font-medium text-zinc-300 hover:text-zinc-50 transition-colors relative group"
               >
                 TV Series
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
-              </Link>
+              </Link> */}
               <Link
-                href="/movies"
+                href="/movie"
                 className="text-base font-medium text-zinc-300 hover:text-zinc-50 transition-colors relative group"
               >
                 Movies
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
-                href="/series"
+                href="/genre"
                 className="text-base font-medium text-zinc-300 hover:text-zinc-50 transition-colors relative group"
               >
-                Series
+                Genre
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
@@ -52,12 +52,12 @@ export function Header() {
 
             <div className="flex items-center gap-3">
               <Link href="/register">
-                <button className="bg-white/5 hover:bg-white/10 backdrop-blur-sm text-zinc-50 px-6 py-1 rounded-lg font-medium border border-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-200">
+                <button className="bg-white/5 hover:bg-white/10 backdrop-blur-sm text-zinc-50 px-6 py-1 rounded-lg font-medium border border-white/10 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all duration-200 cursor-pointer">
                   Sign Up
                 </button>
               </Link>
               <Link href="/login">
-                <button className="bg-zinc-50 hover:bg-white text-zinc-950 px-6 py-1 rounded-lg font-medium shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all duration-200">
+                <button className="bg-zinc-50 hover:bg-white text-zinc-950 px-6 py-1 rounded-lg font-medium shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all duration-200 cursor-pointer">
                   Login
                 </button>
               </Link>

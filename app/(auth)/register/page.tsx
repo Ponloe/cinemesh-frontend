@@ -1,33 +1,21 @@
 import { Header } from "@/components/header";
 import { RegisterForm } from "@/components/auth/register-form";
+import { Footer } from "@/components/footer";
 
 export default function Register() {
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-linear-to-b from-zinc-950 via-red-950/20 to-red-950">
       <Header />
 
       <main className="container mx-auto px-4 py-12 flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="w-full max-w-md">
-          <h1 className="mb-6 text-3xl font-bold text-zinc-50 text-center">Register for CineMesh</h1>
-          <RegisterForm />
-        </div>
-      </main>
-
-      <footer className="mt-24 border-t border-zinc-800 bg-zinc-900/50 py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
-            <div>
-              <h4 className="mb-1 text-lg font-bold text-zinc-50">CineMesh</h4>
-              <p className="text-sm text-zinc-500">
-                A Modern Film Discovery Experience
-              </p>
-            </div>
-            <p className="text-sm text-zinc-600">
-              © 2025 CineMesh. Mock data for demonstration.
-            </p>
+          <div className="rounded-2xl bg-white/5 p-8 backdrop-blur-xl">
+            <h1 className="mb-6 text-3xl font-bold text-zinc-50 text-center">Register for CineMesh</h1>
+            <RegisterForm />
           </div>
         </div>
-      </footer>
+      </main>
+      <Footer />
     </div>
   );
 }
