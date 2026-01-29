@@ -364,11 +364,11 @@ export default function CinemasPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div className="min-h-screen bg-linear-to-br from-zinc-950 via-red-950/20 to-red-950 flex flex-col">
       <Header />
       <div className="flex flex-1 max-w-6xl mx-auto w-full pt-8">
         {/* Sidebar */}
-        <aside className="w-64 bg-black border-r border-zinc-900 pt-8 px-6 shrink-0">
+        <aside className="w-64 border-r border-zinc-900 pt-8 px-6 shrink-0">
           <nav className="space-y-2">
             <div className="mb-6">
               <h3 className="text-sm font-normal text-zinc-500 px-3">Movies</h3>
@@ -396,7 +396,7 @@ export default function CinemasPage() {
             ))}
           </nav>
         </aside>
-        <div className="flex-1 pt-8 pb-16 px-8">{renderContent()}</div>
+        <div className="flex-1 pt-8 pb-16 px-8 ">{renderContent()}</div>
       </div>
 
       <Footer />

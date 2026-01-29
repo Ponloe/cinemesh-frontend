@@ -6,7 +6,7 @@ import { mockMovies } from "@/lib/mock-data";
 
 export default function MoviesPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-linear-to-br from-zinc-950 via-red-950/20 to-red-950">
       <Header />
       <Hero
         title="Movies"

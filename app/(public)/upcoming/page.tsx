@@ -48,7 +48,7 @@ const UPCOMING_MOVIES = [
 
 export default function UpcomingPage() {
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-linear-to-bl from-zinc-950 via-red-950/20 to-red-950">
       <Header />
       <Hero
         title="Upcoming"
