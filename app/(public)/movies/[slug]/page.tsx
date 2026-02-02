@@ -183,55 +183,53 @@ export default async function MovieDetailPage({
       <div className="container mx-auto px-4 -mt-32 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Left Column - Poster and Streaming (side by side on mobile) */}
-            <div className="shrink-0">
-              <div className="flex gap-4 md:flex-col md:space-y-6">
-                <div className="w-32 sm:w-40 md:w-64 shrink-0 overflow-hidden rounded-xl shadow-2xl ring-1 ring-zinc-800">
-                  <Image
-                    src={movie.poster}
-                    alt={`${movie.title} poster`}
-                    width={256}
-                    height={384}
-                    className="w-full h-auto object-cover"
-                    unoptimized
-                  />
+            {/* Left Column */}
+            <div className="shrink-0 flex gap-3 md:flex-col md:gap-0 md:space-y-6">
+              <div className="w-28 sm:w-32 md:w-64 shrink-0 overflow-hidden rounded-xl shadow-2xl ring-1 ring-zinc-800">
+                <Image
+                  src={movie.poster}
+                  alt={`${movie.title} poster`}
+                  width={256}
+                  height={384}
+                  className="w-full h-auto object-cover"
+                  unoptimized
+                />
+              </div>
+
+              <div className="flex-1 md:flex-none space-y-3 md:space-y-6">
+                <div>
+                  <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
+                    Stream It Now
+                  </h3>
+                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-2 md:p-4 md:w-64">
+                    {STREAMING_SERVICES.map((service) => (
+                      <div
+                        key={service.name}
+                        className="flex items-center justify-between py-1.5 md:py-2"
+                      >
+                        <span className="text-xs md:text-base text-zinc-300">{service.name}</span>
+                        <span className="text-red-500 font-bold text-sm md:text-lg">
+                          {service.logo}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex-1 md:flex-none space-y-4 md:space-y-6">
-                  <div>
-                    <h3 className="text-base md:text-lg font-semibold mb-2 md:mb-3 text-white">
-                      Stream It Now
-                    </h3>
-                    <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl border border-zinc-800 p-3 md:p-4 md:w-64">
-                      {STREAMING_SERVICES.map((service) => (
-                        <div
-                          key={service.name}
-                          className="flex items-center justify-between py-2"
-                        >
-                          <span className="text-sm md:text-base text-zinc-300">{service.name}</span>
-                          <span className="text-red-500 font-bold text-base md:text-lg">
-                            {service.logo}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-base md:text-lg font-semibold mb-2 md:mb-3 text-white">
-                      Now Showing
-                    </h3>
-                    <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl border border-zinc-800 p-3 md:p-4 md:w-64">
-                      {THEATERS.map((theater) => (
-                        <div
-                          key={theater.name}
-                          className="flex items-center justify-between py-2"
-                        >
-                          <span className="text-sm md:text-base text-zinc-300">{theater.name}</span>
-                          <span className="text-lg md:text-xl">{theater.logo}</span>
-                        </div>
-                      ))}
-                    </div>
+                <div>
+                  <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
+                    Now Showing
+                  </h3>
+                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-2 md:p-4 md:w-64">
+                    {THEATERS.map((theater) => (
+                      <div
+                        key={theater.name}
+                        className="flex items-center justify-between py-1.5 md:py-2"
+                      >
+                        <span className="text-xs md:text-base text-zinc-300">{theater.name}</span>
+                        <span className="text-base md:text-xl">{theater.logo}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
