@@ -54,6 +54,13 @@ export function Header() {
                   Upcoming
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
                 </Link>
+                <Link
+                  href="/forum"
+                  className="text-sm lg:text-base font-medium text-zinc-300 hover:text-zinc-50 transition-colors relative group"
+                >
+                  Forum
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
+                </Link>
               </nav>
 
               {/* Desktop Auth Buttons */}
@@ -176,6 +183,13 @@ export function Header() {
               onClick={closeMobileMenu}
             >
               Upcoming
+            </Link>
+            <Link
+              href="/forum"
+              className="px-4 py-3 text-zinc-300 hover:text-zinc-50 hover:bg-white/5 rounded-lg transition-all font-medium"
+              onClick={closeMobileMenu}
+            >
+              Forum
             </Link>
           </nav>
 
