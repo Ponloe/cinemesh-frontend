@@ -241,3 +241,15 @@ export async function deleteReply(id: string): Promise<void> {
         method: 'DELETE',
     });
 }
+
+export async function upvoteThread(slug: string): Promise<{ upvotes: number; upvoted: boolean }> {
+    return forumRequest<{ upvotes: number; upvoted: boolean }>(`/threads/${slug}/upvote`, {
+        method: 'PATCH',
+    });
+}
+
+export async function upvoteReply(id: string): Promise<{ upvotes: number; upvoted: boolean }> {
+    return forumRequest<{ upvotes: number; upvoted: boolean }>(`/replies/${id}/upvote`, {
+        method: 'POST',
+    });
+}

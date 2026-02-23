@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, MessageSquare, ArrowUp, ArrowDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getThread, getReplies, createReply, updateThread } from "@/lib/forum-api";
+import { getThread, getReplies, createReply } from "@/lib/forum-api";
 import { isAuthenticated, getUser } from "@/lib/auth";
 import type { ForumThread, ForumReply } from "@/lib/types";
 
@@ -54,6 +54,9 @@ export default function ThreadPage() {
     fetchData();
   }, [slug, page]);
 
+  
+
+
   const handleUpvoteThread = async () => {
     if (!isLoggedIn) {
       router.push("/login");
@@ -68,10 +71,23 @@ export default function ThreadPage() {
         ? thread!.stats.upvotes - 1
         : thread!.stats.upvotes + 1;
 
-      await updateThread(slug, {
-        // You may need to adjust this based on your API
-      });
+      // Call the upvote endpoint
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_FORUM_API_URL}/threads/${slug}/upvote`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error('Failed to upvote thread');
+      }
+
+      // Update local state
       setThread((prev) => prev ? {
         ...prev,
         stats: { ...prev.stats, upvotes: updatedUpvotes },
@@ -164,12 +180,6 @@ export default function ThreadPage() {
                   {reply.is_edited && " (edited)"}
                 </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <button className="flex items-center gap-1 text-zinc-400 hover:text-orange-400 transition-colors">
-                <ArrowUp className="w-4 h-4" />
-                {reply.stats.upvotes}
-              </button>
             </div>
           </div>
 
