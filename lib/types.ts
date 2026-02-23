@@ -1,5 +1,8 @@
 export interface User {
-    id: number;
+    _id?: string;
+    id?: number;
+    username?: string;
+    name?: string;
     email: string;
     role: string;
 }
@@ -54,14 +57,14 @@ export interface ForumThread {
     _id: string;
     slug: string; 
     topic_slug: string;
-    movie_id?: number;
-    movie_title?: string;
+    movie_id?: number | null;
+    movie_title?: string | null;
     title: string;
     content: string;
     created_by: {
-        user_id: number;
+        user_id: string; 
         username: string;
-        avatar_url?: string; 
+        avatar_url?: string | null; 
     };
     tags: string[];
     stats: {
@@ -71,10 +74,15 @@ export interface ForumThread {
     };
     is_pinned: boolean;
     is_locked: boolean;
+    is_deleted?: boolean;
+    upvoted_by?: string[];
     created_at: string;
     updated_at: string;
     last_activity_at: string;
+    __v?: number;
 }
+
+
 
 export interface ForumReply {
     _id: string;
@@ -83,9 +91,9 @@ export interface ForumReply {
     depth: number;
     content: string;
     created_by: {
-        user_id: number;
+        user_id: string; 
         username: string;
-        avatar_url?: string; 
+        avatar_url?: string | null; 
     };
     stats: {
         upvotes: number;

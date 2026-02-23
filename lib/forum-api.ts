@@ -1,5 +1,5 @@
 import { API_CONFIG, DEFAULT_PAGE_SIZE } from './constants';
-import { getToken } from './auth';
+import { getToken, getUser } from './auth';
 import type {
     ForumTopic,
     ForumThread,
@@ -15,7 +15,6 @@ import type {
     UpdateReplyRequest,
 } from './types';
 
-// Base forum API request function
 async function forumRequest<T>(
     endpoint: string,
     options?: RequestInit
@@ -27,7 +26,6 @@ async function forumRequest<T>(
         ...(options?.headers as Record<string, string>),
     };
 
-    // Add auth token if available
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -45,9 +43,25 @@ async function forumRequest<T>(
         throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const result = await response.json();
+    
+    // Check if this is a paginated response
+    if (result && typeof result === 'object' && 'success' in result) {
+        // If it has pagination, return both data and pagination
+        if ('pagination' in result) {
+            return {
+                data: result.data || [],
+                pagination: result.pagination
+            } as T;
+        }
+        // Otherwise, just return the data field
+        if ('data' in result) {
+            return result.data as T;
+        }
+    }
+    
+    return result as T;
 }
-
 // Helper to build query string
 function buildQueryString(params: Record<string, any>): string {
     const searchParams = new URLSearchParams();
@@ -133,9 +147,23 @@ export async function createThread(
     topicSlug: string,
     data: CreateThreadRequest
 ): Promise<ForumThread> {
+    const user = getUser();
+    if (!user) {
+        throw new Error('User must be logged in to create a thread');
+    }
+
+    const requestData = {
+        ...data,
+        created_by: {
+            user_id: String(user.id || user._id),
+            username: user.username || user.name || user.email?.split('@')[0] || 'Anonymous',
+            avatar_url: null,
+        },
+    };
+
     return forumRequest<ForumThread>(`/topics/${topicSlug}/threads`, {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestData),
     });
 }
 
@@ -178,9 +206,23 @@ export async function createReply(
     threadSlug: string,
     data: CreateReplyRequest
 ): Promise<ForumReply> {
+    const user = getUser();
+    if (!user) {
+        throw new Error('User must be logged in to create a reply');
+    }
+
+    const requestData = {
+        ...data,
+        created_by: {
+            user_id: String(user.id || user._id),
+            username: user.username || user.name || user.email?.split('@')[0] || 'Anonymous',
+            avatar_url: null,
+        },
+    };
+
     return forumRequest<ForumReply>(`/threads/${threadSlug}/replies`, {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(requestData),
     });
 }
 

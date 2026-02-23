@@ -35,16 +35,24 @@ export default function ForumIndexPage() {
         
         // First fetch topics
         const topicsData = await getTopics({ page: 1, limit: 10 });
-        setTopics(topicsData.data);
+        console.log('Topics Data:', topicsData);
+        
+        // Check if topicsData has the expected structure
+        const topicsArray = topicsData?.data || topicsData || [];
+        setTopics(Array.isArray(topicsArray) ? topicsArray : []);
         
         // Then fetch recent threads from the first topic if available
-        if (topicsData.data.length > 0) {
-          const firstTopicSlug = topicsData.data[0].slug;
+        if (Array.isArray(topicsArray) && topicsArray.length > 0) {
+          const firstTopicSlug = topicsArray[0].slug;
           const threadsData = await getThreadsByTopic(firstTopicSlug, { 
             page: 1, 
             limit: 3 
           });
-          setRecentThreads(threadsData.data);
+          console.log('Threads Data:', threadsData);
+          
+          // Check if threadsData has the expected structure
+          const threadsArray = threadsData?.data || threadsData || [];
+          setRecentThreads(Array.isArray(threadsArray) ? threadsArray : []);
         }
       } catch (err) {
         console.error("Failed to fetch forum data:", err);
@@ -59,8 +67,16 @@ export default function ForumIndexPage() {
 
   // Helper function to format time
   const formatTimeAgo = (dateString: string) => {
+    if (!dateString) return 'just now';
+    
     const date = new Date(dateString);
     const now = new Date();
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'just now';
+    }
+    
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
     
     if (seconds < 60) return `${seconds}s ago`;
