@@ -12,6 +12,16 @@ export function Header() {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  // Helper to get user display name
+  const getUserDisplayName = () => {
+    return user?.username || user?.name || user?.email?.split('@')[0] || 'User';
+  };
+
+  const getUserInitial = () => {
+    const displayName = getUserDisplayName();
+    return displayName[0].toUpperCase();
+  };
+
   return (
     <>
       <header className="sticky top-4 md:top-8 z-50 px-4 md:px-8 lg:px-70">
@@ -54,6 +64,13 @@ export function Header() {
                   Upcoming
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
                 </Link>
+                <Link
+                  href="/forum"
+                  className="text-sm lg:text-base font-medium text-zinc-300 hover:text-zinc-50 transition-colors relative group"
+                >
+                  Forum
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-orange-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
+                </Link>
               </nav>
 
               {/* Desktop Auth Buttons */}
@@ -61,14 +78,14 @@ export function Header() {
                 {isAuthenticated && user ? (
                   <div className="flex items-center gap-2 lg:gap-3">
                     <Link
-                      href={`/users/${user.username}`}
+                      href={`/users/${user.username || user.id}`}
                       className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     >
                       <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-linear-to-br from-orange-500 to-pink-600 flex items-center justify-center text-white font-semibold text-sm">
-                        {user.username[0].toUpperCase()}
+                        {getUserInitial()}
                       </div>
                       <span className="text-zinc-300 font-medium hidden lg:block text-sm">
-                        {user.username}
+                        {getUserDisplayName()}
                       </span>
                     </Link>
                     <button
@@ -139,15 +156,15 @@ export function Header() {
           {isAuthenticated && user && (
             <div className="mb-8 pb-6 border-b border-white/10">
               <Link
-                href={`/users/${user.username}`}
+                href={`/users/${user.username || user.id}`}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                 onClick={closeMobileMenu}
               >
                 <div className="w-12 h-12 rounded-full bg-linear-to-br from-orange-500 to-pink-600 flex items-center justify-center text-white font-semibold text-lg">
-                  {user.username[0].toUpperCase()}
+                  {getUserInitial()}
                 </div>
                 <div>
-                  <p className="text-zinc-50 font-medium">{user.username}</p>
+                  <p className="text-zinc-50 font-medium">{getUserDisplayName()}</p>
                   <p className="text-zinc-400 text-sm">View Profile</p>
                 </div>
               </Link>
@@ -176,6 +193,13 @@ export function Header() {
               onClick={closeMobileMenu}
             >
               Upcoming
+            </Link>
+            <Link
+              href="/forum"
+              className="px-4 py-3 text-zinc-300 hover:text-zinc-50 hover:bg-white/5 rounded-lg transition-all font-medium"
+              onClick={closeMobileMenu}
+            >
+              Forum
             </Link>
           </nav>
 
