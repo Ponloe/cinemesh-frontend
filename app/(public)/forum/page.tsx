@@ -4,76 +4,9 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Link from "next/link";
 import { Film, TrendingUp, Calendar, Star, MessageSquare } from "lucide-react";
-
-// Mock data for forum topics
-const forumTopics = [
-  {
-    id: 1,
-    name: "Movie Discussions",
-    slug: "movies",
-    description: "Discuss your favorite movies, theories, and analysis",
-    thread_count: 1247,
-    icon: "film",
-    gradient: "from-blue-500/20 to-cyan-500/20",
-  },
-  {
-    id: 2,
-    name: "Trending Now",
-    slug: "trending",
-    description: "What's hot in cinema right now",
-    thread_count: 342,
-    icon: "trending",
-    gradient: "from-orange-500/20 to-pink-600/20",
-  },
-  {
-    id: 3,
-    name: "Upcoming Releases",
-    slug: "upcoming",
-    description: "Anticipation and predictions for upcoming films",
-    thread_count: 189,
-    icon: "calendar",
-    gradient: "from-purple-500/20 to-pink-500/20",
-  },
-  {
-    id: 4,
-    name: "Reviews & Ratings",
-    slug: "reviews",
-    description: "Share your thoughts and rate movies",
-    thread_count: 892,
-    icon: "star",
-    gradient: "from-yellow-500/20 to-orange-500/20",
-  },
-];
-
-const recentThreads = [
-  {
-    _id: "1",
-    title: "Dune: Part Two - Visual Masterpiece or Overhyped?",
-    topic: "Movie Discussions",
-    username: "filmBuff89",
-    replies: 45,
-    upvotes: 123,
-    createdAt: "2h ago",
-  },
-  {
-    _id: "2",
-    title: "Best Christopher Nolan movies ranked",
-    topic: "Reviews & Ratings",
-    username: "cinephile_x",
-    replies: 67,
-    upvotes: 89,
-    createdAt: "5h ago",
-  },
-  {
-    _id: "3",
-    title: "What are you most excited for in 2025?",
-    topic: "Upcoming Releases",
-    username: "movieAddict",
-    replies: 34,
-    upvotes: 56,
-    createdAt: "8h ago",
-  },
-];
+import { useEffect, useState } from "react";
+import { getTopics, getThreadsByTopic } from "@/lib/forum-api";
+import type { ForumTopic, ForumThread } from "@/lib/types";
 
 const iconComponents = {
   film: Film,
@@ -82,7 +15,75 @@ const iconComponents = {
   star: Star,
 };
 
+const topicIconMap: Record<string, keyof typeof iconComponents> = {
+  movies: "film",
+  trending: "trending",
+  upcoming: "calendar",
+  reviews: "star",
+};
+
 export default function ForumIndexPage() {
+  const [topics, setTopics] = useState<ForumTopic[]>([]);
+  const [recentThreads, setRecentThreads] = useState<ForumThread[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setIsLoading(true);
+        
+        // First fetch topics
+        const topicsData = await getTopics({ page: 1, limit: 10 });
+        setTopics(topicsData.data);
+        
+        // Then fetch recent threads from the first topic if available
+        if (topicsData.data.length > 0) {
+          const firstTopicSlug = topicsData.data[0].slug;
+          const threadsData = await getThreadsByTopic(firstTopicSlug, { 
+            page: 1, 
+            limit: 3 
+          });
+          setRecentThreads(threadsData.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch forum data:", err);
+        setError(err instanceof Error ? err.message : "Failed to load forum data");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // Helper function to format time
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-red-950/20 to-red-950">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-5xl mx-auto text-center">
+            <h1 className="text-2xl font-bold text-zinc-50 mb-4">Error Loading Forum</h1>
+            <p className="text-zinc-400">{error}</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-red-950/20 to-red-950">
       <Header />
@@ -101,78 +102,97 @@ export default function ForumIndexPage() {
         {/* Topics Grid */}
         <div className="max-w-5xl mx-auto mb-12">
           <h2 className="text-2xl font-bold text-zinc-50 mb-6">Browse Topics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {forumTopics.map((topic) => {
-              const IconComponent = iconComponents[topic.icon as keyof typeof iconComponents];
-              return (
-                <Link
-                  key={topic.id}
-                  href={`/forum/topic/${topic.slug}`}
-                  className="block"
-                >
-                  <div className={`rounded-xl bg-gradient-to-r ${topic.gradient} p-6 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-200 group`}>
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all">
-                        <IconComponent className="w-6 h-6 text-zinc-50" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-zinc-50 mb-2 group-hover:text-orange-400 transition-colors">
-                          {topic.name}
-                        </h3>
-                        <p className="text-zinc-400 text-sm mb-3">
-                          {topic.description}
-                        </p>
-                        <div className="flex items-center gap-2 text-zinc-500 text-sm">
-                          <MessageSquare className="w-4 h-4" />
-                          <span>{topic.thread_count.toLocaleString()} threads</span>
+          {isLoading ? (
+            <div className="text-center text-zinc-400 py-8">Loading topics...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {topics.map((topic) => {
+                const iconKey = topicIconMap[topic.slug] || "film";
+                const IconComponent = iconComponents[iconKey];
+                return (
+                  <Link
+                    key={topic._id}
+                    href={`/forum/topic/${topic.slug}`}
+                    className="block"
+                  >
+                    <div className={`rounded-xl bg-gradient-to-r ${topic.gradient} p-6 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-200 group`}>
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-lg bg-white/10 group-hover:bg-white/20 transition-all">
+                          <IconComponent className="w-6 h-6 text-zinc-50" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold text-zinc-50 mb-2 group-hover:text-orange-400 transition-colors">
+                            {topic.name}
+                          </h3>
+                          <p className="text-zinc-400 text-sm mb-3">
+                            {topic.description}
+                          </p>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Recent Activity */}
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-zinc-50 mb-6">Recent Activity</h2>
-          <div className="space-y-3">
-            {recentThreads.map((thread) => (
-              <Link
-                key={thread._id}
-                href={`/forum/thread/${thread._id}`}
-                className="block"
-              >
-                <div className="rounded-lg bg-white/5 hover:bg-white/10 p-4 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-200 group">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-zinc-50 mb-1 group-hover:text-orange-400 transition-colors">
-                        {thread.title}
-                      </h3>
-                      <div className="flex items-center gap-3 text-sm text-zinc-500">
-                        <span className="px-2 py-0.5 rounded bg-white/5 text-zinc-400">
-                          {thread.topic}
+          {isLoading ? (
+            <div className="text-center text-zinc-400 py-8">Loading recent threads...</div>
+          ) : recentThreads.length > 0 ? (
+            <div className="space-y-3">
+              {recentThreads.map((thread) => (
+                <Link
+                  key={thread._id}
+                  href={`/forum/thread/${thread.slug}`}
+                  className="block"
+                >
+                  <div className="rounded-lg bg-white/5 hover:bg-white/10 p-4 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-200 group">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-semibold text-zinc-50 mb-1 group-hover:text-orange-400 transition-colors">
+                          {thread.title}
+                        </h3>
+                        <div className="flex items-center gap-3 text-sm text-zinc-500">
+                          <span>by {thread.created_by?.username || 'Unknown'}</span>
+                          <span>{formatTimeAgo(thread.created_at)}</span>
+                          {thread.movie_title && (
+                            <span className="px-2 py-0.5 rounded bg-white/5 text-zinc-400">
+                              {thread.movie_title}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-zinc-500">
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="w-4 h-4" />
+                          {thread.stats.reply_count}
                         </span>
-                        <span>by {thread.username}</span>
-                        <span>{thread.createdAt}</span>
+                        <span className="flex items-center gap-1 text-orange-400">
+                          ↑ {thread.stats.upvotes}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-zinc-500">
-                      <span className="flex items-center gap-1">
-                        <MessageSquare className="w-4 h-4" />
-                        {thread.replies}
-                      </span>
-                      <span className="flex items-center gap-1 text-orange-400">
-                        ↑ {thread.upvotes}
-                      </span>
-                    </div>
                   </div>
+                </Link>
+              ))}
+            </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 mb-4">
+                  <MessageSquare className="w-10 h-10 text-zinc-600" />
                 </div>
-              </Link>
-            ))}
-          </div>
+                <h3 className="text-xl font-semibold text-zinc-400 mb-2">
+                  Oops, it looks quite empty here
+                </h3>
+                <p className="text-zinc-500">
+                  No recent activity in the forums yet
+                </p>
+              </div>
+            )}
         </div>
       </main>
 

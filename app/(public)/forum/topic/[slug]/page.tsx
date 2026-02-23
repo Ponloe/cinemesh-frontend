@@ -3,256 +3,200 @@
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Link from "next/link";
-import { useState, use } from "react";
-import { MessageSquare, ThumbsUp, Clock, Tag, ArrowLeft } from "lucide-react";
+import { MessageSquare, ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { getTopic, getThreadsByTopic } from "@/lib/forum-api";
+import type { ForumTopic, ForumThread } from "@/lib/types";
 
-// Mock data based on topic
-const getTopicData = (slug: string) => {
-  const topics: Record<string, any> = {
-    movies: {
-      name: "Movie Discussions",
-      description: "Discuss your favorite movies, theories, and analysis",
-      threads: [
-        {
-          _id: "1",
-          title: "Fight Club - What does the ending really mean?",
-          movie: "Fight Club",
-          created_by: { user_id: 12, username: "ponloe" },
-          tags: ["theory", "ending", "spoilers"],
-          stats: { reply_count: 14, upvotes: 87 },
-          createdAt: "2024-12-01T08:23:12Z",
-        },
-        {
-          _id: "2",
-          title: "Inception explained: All layers breakdown",
-          movie: "Inception",
-          created_by: { user_id: 15, username: "dreamWeaver" },
-          tags: ["analysis", "theory"],
-          stats: { reply_count: 32, upvotes: 156 },
-          createdAt: "2024-12-02T14:05:44Z",
-        },
-      ],
-    },
-    trending: {
-      name: "Trending Now",
-      description: "What's hot in cinema right now",
-      threads: [
-        {
-          _id: "3",
-          title: "Dune: Part Two is breaking box office records!",
-          movie: "Dune: Part Two",
-          created_by: { user_id: 18, username: "spiceFlow" },
-          tags: ["box-office", "sci-fi"],
-          stats: { reply_count: 45, upvotes: 203 },
-          createdAt: "2024-12-03T10:15:30Z",
-        },
-      ],
-    },
-    upcoming: {
-      name: "Upcoming Releases",
-      description: "Anticipation and predictions for upcoming films",
-      threads: [],
-    },
-    reviews: {
-      name: "Reviews & Ratings",
-      description: "Share your thoughts and rate movies",
-      threads: [],
-    },
-  };
+export default function TopicPage() {
+  const params = useParams();
+  const slug = params.slug as string;
 
-  return topics[slug] || topics.movies;
-};
+  const [topic, setTopic] = useState<ForumTopic | null>(null);
+  const [threads, setThreads] = useState<ForumThread[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-export default function TopicPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
-  const topicData = getTopicData(slug);
-  const [sortBy, setSortBy] = useState<"recent" | "popular">("popular");
-  const [filterTag, setFilterTag] = useState<string | null>(null);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setIsLoading(true);
+        const [topicData, threadsData] = await Promise.all([
+          getTopic(slug),
+          getThreadsByTopic(slug, { page, limit: 20 }),
+        ]);
+        
+        setTopic(topicData);
+        setThreads(threadsData.data);
+        setTotalPages(threadsData.pagination.pages);
+      } catch (err) {
+        console.error("Failed to fetch topic data:", err);
+        setError(err instanceof Error ? err.message : "Failed to load topic");
+      } finally {
+        setIsLoading(false);
+      }
+    }
 
-  // Get all unique tags
-  const allTags: string[] = Array.from(
-    new Set(topicData.threads.flatMap((t: any) => t.tags))
-  );
+    fetchData();
+  }, [slug, page]);
 
-  const formatDate = (dateString: string) => {
+  const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
   };
 
-  const filteredThreads = filterTag
-    ? topicData.threads.filter((t: any) => t.tags.includes(filterTag))
-    : topicData.threads;
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-red-950/20 to-red-950">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-5xl mx-auto text-center">
+            <h1 className="text-2xl font-bold text-zinc-50 mb-4">Error Loading Topic</h1>
+            <p className="text-zinc-400">{error}</p>
+            <Link href="/forum" className="text-orange-400 hover:text-orange-300 mt-4 inline-block">
+              ← Back to Forum
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (isLoading || !topic) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-red-950/20 to-red-950">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-5xl mx-auto text-center text-zinc-400 py-8">
+            Loading...
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-red-950/20 to-red-950">
       <Header />
 
       <main className="container mx-auto px-4 py-12">
-        {/* Breadcrumb */}
-        <div className="max-w-5xl mx-auto mb-6">
+        <div className="max-w-5xl mx-auto">
+          {/* Back Button */}
           <Link
             href="/forum"
-            className="inline-flex items-center gap-2 text-zinc-400 hover:text-zinc-300 transition-colors text-sm"
+            className="inline-flex items-center gap-2 text-zinc-400 hover:text-zinc-300 mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Forums
+            Back to Forum
           </Link>
-        </div>
 
-        {/* Topic Header */}
-        <div className="max-w-5xl mx-auto mb-8">
-          <div className="rounded-2xl bg-gradient-to-r from-orange-500/20 to-pink-600/20 p-8 backdrop-blur-xl border border-white/10">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-zinc-50 mb-2">
-                  {topicData.name}
-                </h1>
-                <p className="text-zinc-400 text-lg">{topicData.description}</p>
-              </div>
-              <button className="bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-all duration-200">
-                + New Thread
-              </button>
+          {/* Topic Header */}
+          {/* <div className={`rounded-xl bg-gradient-to-r ${topic.gradient} p-8 backdrop-blur-xl border border-white/10 mb-8`}>
+            <h1 className="text-3xl font-bold text-zinc-50 mb-3">
+              {topic.name}
+            </h1>
+            <p className="text-zinc-300 mb-4">{topic.description}</p>
+            <div className="flex items-center gap-2 text-zinc-400 text-sm">
+              <MessageSquare className="w-4 h-4" />
+              <span>{(topic.thread_count || 0).toLocaleString()} threads</span>
             </div>
-          </div>
-        </div>
+          </div> */}
 
-        {/* Filters */}
-        <div className="max-w-5xl mx-auto mb-6">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-zinc-400 text-sm">Sort by:</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSortBy("popular")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    sortBy === "popular"
-                      ? "bg-white/10 text-zinc-50 border border-white/20"
-                      : "bg-white/5 text-zinc-400 border border-white/5 hover:bg-white/10"
-                  }`}
+          {/* Threads List */}
+          <div className="space-y-3">
+            {threads.length > 0 ? (
+              threads.map((thread) => (
+                <Link
+                  key={thread._id}
+                  href={`/forum/thread/${thread.slug}`}
+                  className="block"
                 >
-                  Popular
-                </button>
-                <button
-                  onClick={() => setSortBy("recent")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    sortBy === "recent"
-                      ? "bg-white/10 text-zinc-50 border border-white/20"
-                      : "bg-white/5 text-zinc-400 border border-white/5 hover:bg-white/10"
-                  }`}
-                >
-                  Recent
-                </button>
-              </div>
-            </div>
-
-            {/* Tag Filters */}
-            {allTags.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-zinc-400 text-sm">Filter:</span>
-                <button
-                  onClick={() => setFilterTag(null)}
-                  className={`px-3 py-1 rounded-lg text-sm transition-all ${
-                    !filterTag
-                      ? "bg-white/10 text-zinc-50 border border-white/20"
-                      : "bg-white/5 text-zinc-400 border border-white/5 hover:bg-white/10"
-                  }`}
-                >
-                  All
-                </button>
-                {allTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => setFilterTag(tag)}
-                    className={`px-3 py-1 rounded-lg text-sm transition-all ${
-                      filterTag === tag
-                        ? "bg-white/10 text-zinc-50 border border-white/20"
-                        : "bg-white/5 text-zinc-400 border border-white/5 hover:bg-white/10"
-                    }`}
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Thread List */}
-        <div className="max-w-5xl mx-auto space-y-4">
-          {filteredThreads.length > 0 ? (
-            filteredThreads.map((thread: any) => (
-              <Link
-                key={thread._id}
-                href={`/forum/thread/${thread._id}`}
-                className="block"
-              >
-                <div className="rounded-xl bg-white/5 hover:bg-white/10 p-6 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-200 group">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-pink-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                      {thread.created_by.username[0].toUpperCase()}
-                    </div>
-
+                <div className="rounded-lg bg-white/5 hover:bg-white/10 p-4 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-200 group">
+                  <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-zinc-50 mb-2 group-hover:text-orange-400 transition-colors">
+                      {thread.is_pinned && (
+                        <span className="inline-block px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 text-xs font-medium mb-2">
+                          PINNED
+                        </span>
+                      )}
+                      <h3 className="text-base font-semibold text-zinc-50 mb-1 group-hover:text-orange-400 transition-colors">
                         {thread.title}
                       </h3>
-
-                      {thread.movie && (
-                        <p className="text-zinc-500 text-sm mb-2">
-                          in <span className="text-zinc-400">{thread.movie}</span>
-                        </p>
-                      )}
-
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {thread.tags.map((tag: string) => (
-                          <span
-                            key={tag}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 text-zinc-400 text-xs border border-white/10"
-                          >
-                            <Tag className="w-3 h-3" />
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {formatDate(thread.createdAt)}
-                        </span>
+                      <div className="flex items-center gap-3 text-sm text-zinc-500">
                         <span>by {thread.created_by.username}</span>
-                        <span className="flex items-center gap-1">
-                          <MessageSquare className="w-4 h-4" />
-                          {thread.stats.reply_count} replies
-                        </span>
-                        <span className="flex items-center gap-1 text-orange-400">
-                          <ThumbsUp className="w-4 h-4" />
-                          {thread.stats.upvotes}
-                        </span>
+                        <span>{formatTimeAgo(thread.created_at)}</span>
+                        {thread.movie_title && (
+                          <span className="px-2 py-0.5 rounded bg-white/5 text-zinc-400">
+                            {thread.movie_title}
+                          </span>
+                        )}
                       </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-zinc-500">
+                      <span className="flex items-center gap-1">
+                        <MessageSquare className="w-4 h-4" />
+                        {thread.stats.reply_count}
+                      </span>
+                      <span className="flex items-center gap-1 text-orange-400">
+                        ↑ {thread.stats.upvotes}
+                      </span>
                     </div>
                   </div>
                 </div>
               </Link>
-            ))
-          ) : (
-            <div className="rounded-xl bg-white/5 p-12 backdrop-blur-xl border border-white/10 text-center">
-              <MessageSquare className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-zinc-400 mb-2">
-                No threads found
-              </h3>
-              <p className="text-zinc-500 mb-6">
-                {filterTag
-                  ? `No threads with the tag "${filterTag}"`
-                  : "Be the first to start a discussion!"}
-              </p>
-              <button className="bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-all duration-200">
-                Start a Discussion
+              ))
+            ) : (
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 mb-4">
+                  <MessageSquare className="w-10 h-10 text-zinc-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-zinc-400 mb-2">
+                  Oops, it looks quite empty here
+                </h3>
+                <p className="text-zinc-500 mb-6">
+                  No threads have been created in this topic yet
+                </p>
+                <Link
+                  href="/forum"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Forum
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 rounded bg-white/5 text-zinc-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <span className="text-zinc-400">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-4 py-2 rounded bg-white/5 text-zinc-400 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
               </button>
             </div>
           )}
