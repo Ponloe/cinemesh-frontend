@@ -194,6 +194,47 @@ export async function getMovies(
     };
 }
 
+export async function getUpcomingMovies(
+    params?: PaginationParams
+): Promise<PaginatedResponse<Movie>> {
+    // Fetch all movies first
+    const query = buildQueryString({
+        page: params?.page || 1,
+        limit: 100, // Get more movies to filter
+    });
+    
+    const apiResponse = await moviesRequest<ApiPaginatedResponse<ApiMovie>>(`/movies${query}`);
+    
+    // Filter upcoming movies on the frontend
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to midnight for comparison
+    
+    const upcomingMovies = apiResponse.data.filter(movie => {
+        const releaseDate = new Date(movie.ReleaseDate);
+        return releaseDate >= today;
+    });
+    
+    console.log('Total movies:', apiResponse.data.length);
+    console.log('Upcoming movies:', upcomingMovies.length);
+    
+    // Apply pagination to filtered results
+    const limit = params?.limit || DEFAULT_PAGE_SIZE;
+    const page = params?.page || 1;
+    const startIndex = (page - 1) * limit;
+    const paginatedMovies = upcomingMovies.slice(startIndex, startIndex + limit);
+    
+    return {
+        data: paginatedMovies.map(transformMovie),
+        pagination: {
+            page: page,
+            limit: limit,
+            total: upcomingMovies.length,
+            pages: Math.ceil(upcomingMovies.length / limit),
+        },
+    };
+}
+
+
 export async function getMovie(idOrSlug: string | number): Promise<Movie> {
     const apiResponse = await moviesRequest<ApiSingleResponse<ApiMovie>>(`/movies/${idOrSlug}`);
     return transformMovie(apiResponse.data);
