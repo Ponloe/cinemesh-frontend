@@ -9,6 +9,12 @@ export default async function MoviesPage() {
     const response = await getMovies({ page: 1, limit: 20 });
     const movies = response?.data || [];
 
+    // Get a random movie's backdrop for the hero
+    const randomMovie = movies.length > 0 
+      ? movies[Math.floor(Math.random() * movies.length)]
+      : null;
+    const heroImage = randomMovie?.backdrop_url || randomMovie?.poster_url || "/images/1superman.jpg";
+
     return (
       <div className="min-h-screen bg-linear-to-br from-zinc-950 via-red-950/20 to-red-950">
         <Header />
@@ -16,7 +22,7 @@ export default async function MoviesPage() {
           title="Movies"
           description="Explore all Movies"
           accentColor="rgb(139, 92, 246)"
-          backgroundImage="/images/1superman.jpg"
+          backgroundImage={heroImage}
         />
 
         <div className="container mx-auto px-4">

@@ -1,99 +1,31 @@
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Link from "next/link";
+import { getGenres } from "@/lib/genres-api";
 
-const GENRES = [
-  {
-    id: "action",
-    name: "Action",
-    slug: "action",
-    description: "High-octane thrills and explosive sequences",
-    color: "from-red-600 to-orange-500",
-    count: 245,
-  },
-  {
-    id: "comedy",
-    name: "Comedy",
-    slug: "comedy",
-    description: "Laugh-out-loud moments and witty humor",
-    color: "from-yellow-500 to-amber-400",
-    count: 189,
-  },
-  {
-    id: "drama",
-    name: "Drama",
-    slug: "drama",
-    description: "Compelling stories and emotional depth",
-    color: "from-purple-600 to-pink-500",
-    count: 312,
-  },
-  {
-    id: "sci-fi",
-    name: "Sci-Fi",
-    slug: "sci-fi",
-    description: "Futuristic worlds and advanced technology",
-    color: "from-blue-600 to-cyan-500",
-    count: 178,
-  },
-  {
-    id: "thriller",
-    name: "Thriller",
-    slug: "thriller",
-    description: "Edge-of-your-seat tension and mystery",
-    color: "from-indigo-600 to-purple-500",
-    count: 201,
-  },
-  {
-    id: "romance",
-    name: "Romance",
-    slug: "romance",
-    description: "Heartwarming love stories and emotions",
-    color: "from-pink-500 to-rose-400",
-    count: 167,
-  },
-  {
-    id: "fantasy",
-    name: "Fantasy",
-    slug: "fantasy",
-    description: "Magical realms and mythical adventures",
-    color: "from-violet-600 to-purple-500",
-    count: 143,
-  },
-  {
-    id: "documentary",
-    name: "Documentary",
-    slug: "documentary",
-    description: "Real stories and factual narratives",
-    color: "from-teal-600 to-emerald-500",
-    count: 98,
-  },
-  {
-    id: "animation",
-    name: "Animation",
-    slug: "animation",
-    description: "Animated wonders for all ages",
-    color: "from-orange-500 to-yellow-400",
-    count: 134,
-  },
-  {
-    id: "adventure",
-    name: "Adventure",
-    slug: "adventure",
-    description: "Epic journeys and daring quests",
-    color: "from-emerald-600 to-teal-500",
-    count: 156,
-  },
-    {
-    id: "horror",
-    name: "Horror",
-    slug: "horror",
-    description: "Spine-chilling scares and suspense",
-    color: "from-gray-800 to-red-900",
-    count: 156,
-  },
+function getGenreSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-');
+}
+
+// Array of gradient combinations
+const gradients = [
+  "from-red-600/10 to-orange-500/10 group-hover:from-red-600/20 group-hover:to-orange-500/20",
+  "from-blue-600/10 to-cyan-500/10 group-hover:from-blue-600/20 group-hover:to-cyan-500/20",
+  "from-purple-600/10 to-pink-500/10 group-hover:from-purple-600/20 group-hover:to-pink-500/20",
+  "from-emerald-600/10 to-teal-500/10 group-hover:from-emerald-600/20 group-hover:to-teal-500/20",
+  "from-yellow-600/10 to-amber-500/10 group-hover:from-yellow-600/20 group-hover:to-amber-500/20",
+  "from-indigo-600/10 to-purple-500/10 group-hover:from-indigo-600/20 group-hover:to-purple-500/20",
+  "from-pink-600/10 to-rose-500/10 group-hover:from-pink-600/20 group-hover:to-rose-500/20",
+  "from-violet-600/10 to-fuchsia-500/10 group-hover:from-violet-600/20 group-hover:to-fuchsia-500/20",
 ];
 
-export default function GenrePage() {
+function getGradient(index: number): string {
+  return gradients[index % gradients.length];
+}
+
+export default async function GenrePage() {
+  const genres = await getGenres();
+
   return (
     <div className="min-h-screen bg-linear-to-bl from-zinc-950 via-red-950/20 to-red-950">
       <Header />
@@ -114,33 +46,30 @@ export default function GenrePage() {
       <div className="container mx-auto px-4 pb-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {GENRES.map((genre) => (
-              <Link
-                key={genre.id}
-                href={`/genre/${genre.slug}`}
-                className="group"
-              >
-                <div className="relative overflow-hidden rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 hover:scale-105">
-                  <div className={`absolute inset-0 bg-linear-to-br ${genre.color} opacity-10 group-hover:opacity-20 transition-opacity`} />
-                  <div className="relative p-6">
-                    <div className="flex items-center justify-end mb-3">
-                      <span className="text-xs text-zinc-500 bg-zinc-800/80 px-2 py-1 rounded-full">
-                        {genre.count} titles
-                      </span>
+            {genres.map((genre, index) => {
+              const slug = getGenreSlug(genre.name);
+              const gradient = getGradient(index);
+              
+              return (
+                <Link
+                  key={genre.id}
+                  href={`/genre/${slug}`}
+                  className="group"
+                >
+                  <div className="relative overflow-hidden rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 hover:scale-105 h-32 md:h-36">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${gradient} transition-all`} />
+                    <div className="relative h-full flex items-center justify-center p-6">
+                      <h3 className="text-xl md:text-2xl font-bold text-white text-center">
+                        {genre.name}
+                      </h3>
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">
-                      {genre.name}
-                    </h3>
-                    <p className="text-sm text-zinc-400 line-clamp-2">
-                      {genre.description}
-                    </p>
+                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-white">→</span>
+                    </div>
                   </div>
-                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-white">→</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
