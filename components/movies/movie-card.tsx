@@ -14,14 +14,20 @@ export function MovieCard({ movie }: MovieCardProps) {
   return (
     <Link href={`/movies/${movie.slug}`} className="group relative cursor-pointer block">
       <div className="aspect-2/3 overflow-hidden rounded-md bg-zinc-900 shadow-lg shadow-black/20 ring-1 ring-zinc-800 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-xl group-hover:shadow-black/40 group-hover:ring-zinc-700">
-        <Image
-          src={movie.poster_url}
-          alt={`${movie.title} poster`}
-          width={300}
-          height={450}
-          className="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-75"
-          unoptimized
-        />
+        {movie.poster_url ? (
+          <Image
+            src={movie.poster_url}
+            alt={`${movie.title} poster`}
+            width={300}
+            height={450}
+            className="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-75"
+            unoptimized
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center bg-zinc-800 text-zinc-500">
+            No Image
+          </div>
+        )}
         
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
