@@ -49,6 +49,14 @@ export default function ShowtimesClient({
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedProvider, setSelectedProvider] = useState<string>("");
 
+  // helper to get today's date in ICT (UTC+7)
+  const getIctDateString = () => {
+    const ict = new Date(
+      new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" })
+    );
+    return ict.toISOString().split("T")[0]; // YYYY-MM-DD
+  };
+
   // Extract unique dates from showtimes
   const availableDates = useMemo(() => {
     const dates = new Set<string>();
@@ -73,19 +81,24 @@ export default function ShowtimesClient({
     return Array.from(providers).sort();
   }, [showtimes]);
 
-  // Initialize provider from URL parameter
   useEffect(() => {
-    if (providerParam && availableProviders.length > 0) {
+    if (availableDates.length === 0 || availableProviders.length === 0) return;
+
+    // Set date to today (ICT) if not already set
+    if (!selectedDate) {
+      const ictToday = getIctDateString();
+      setSelectedDate(availableDates.includes(ictToday) ? ictToday : availableDates[0]);
+    }
+
+    // Set provider from URL param if not already set
+    if (!selectedProvider && providerParam) {
       const matchingProvider = availableProviders.find((p) =>
         p.toLowerCase().includes(providerParam.toLowerCase())
       );
-      if (matchingProvider) {
-        setSelectedProvider(matchingProvider);
-      }
+      if (matchingProvider) setSelectedProvider(matchingProvider);
     }
-  }, [providerParam, availableProviders]);
-
-  // Set default selected date to first available date
+  }, [availableDates, availableProviders]);
+  // Set default selected date to first available date (used only if state is empty)
   const defaultDate = useMemo(() => {
     if (availableDates.length > 0 && !selectedDate) {
       return availableDates[0];
@@ -312,9 +325,8 @@ export default function ShowtimesClient({
                   </h2>
                   <ChevronDown
                     size={20}
-                    className={`text-zinc-400 transition-transform ${
-                      isExpanded ? "rotate-180" : ""
-                    }`}
+                    className={`text-zinc-400 transition-transform ${isExpanded ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -352,13 +364,12 @@ export default function ShowtimesClient({
                                   {langGroup.times.map((time) => (
                                     <button
                                       key={time}
-                                      className={`px-4 py-2 rounded-full border-2 transition-all ${
-                                        cinema.provider
+                                      className={`px-4 py-2 rounded-full border-2 transition-all ${cinema.provider
                                           .toLowerCase()
                                           .includes("legend")
                                           ? "border-zinc-700 text-zinc-200 hover:border-red-500 hover:bg-red-500/10"
                                           : "border-zinc-700 text-zinc-200 hover:border-blue-500 hover:bg-blue-500/10"
-                                      }`}
+                                        }`}
                                     >
                                       {time}
                                     </button>

@@ -157,47 +157,59 @@ export default async function MovieDetailPage({
                 </div>
 
                 {/* NOW SHOWING */}
-<div>
-  <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
-    Now Showing
-  </h3>
+                <div>
+                  <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
+                    Now Showing
+                  </h3>
 
-  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-3 md:p-4 md:w-72 space-y-3">
-    {legendShowtimes.length > 0 && (
-      <Link
-        href={`/movies/${slug}/showtimes?provider=Legend`}
-        className="block p-3 rounded-lg hover:bg-zinc-800 transition-colors group"
-      >
-        <p className="text-xs md:text-sm font-bold text-red-400 mb-1 group-hover:text-red-300">
-          🎬 Legend Cinema
-        </p>
-        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
-          {legendShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} showtimes
-        </p>
-      </Link>
-    )}
+                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-2 md:p-4 md:w-64 space-y-3">
+                    {legendShowtimes.length > 0 && (
+                      <Link
+                        href={`/movies/${slug}/showtimes?provider=Legend`}
+                        className="block p-3 rounded-lg hover:bg-zinc-800 transition-colors group"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <Image
+                            src="https://www.legend.com.kh/_ipx/s_117x44/legend-cinema-logo.png"
+                            alt="Legend Cinema"
+                            width={55}
+                            height={20}
+                            unoptimized
+                          />
+                        </div>
+                        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
+                          {legendShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} showtimes
+                        </p>
+                      </Link>
+                    )}
 
-    {primeShowtimes.length > 0 && (
-      <Link
-        href={`/movies/${slug}/showtimes?provider=Prime`}
-        className="block p-3 rounded-lg hover:bg-zinc-800 transition-colors group border-t border-zinc-700 pt-3"
-      >
-        <p className="text-xs md:text-sm font-bold text-blue-400 mb-1 group-hover:text-blue-300">
-          🎭 Prime Cineplex
-        </p>
-        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
-          {primeShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} showtimes
-        </p>
-      </Link>
-    )}
+                    {primeShowtimes.length > 0 && (
+                      <Link
+                        href={`/movies/${slug}/showtimes?provider=Prime`}
+                        className="block p-3 rounded-lg hover:bg-zinc-800 transition-colors group border-t border-zinc-700 pt-3"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <Image
+                            src="https://primecineplex.com/Assets/exolutus/css/images/PrimeLogo.png"
+                            alt="Prime Cineplex"
+                            width={55}
+                            height={20}
+                            unoptimized
+                          />
+                        </div>
+                        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
+                          {primeShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} showtimes
+                        </p>
+                      </Link>
+                    )}
 
-    {legendShowtimes.length === 0 && primeShowtimes.length === 0 && (
-      <p className="text-xs text-zinc-500">
-        No showtimes available
-      </p>
-    )}
-  </div>
-</div>
+                    {legendShowtimes.length === 0 && primeShowtimes.length === 0 && (
+                      <p className="text-xs text-zinc-500">
+                        No showtimes available
+                      </p>
+                    )}
+                  </div>
+                </div>
 
               </div>
             </div>
