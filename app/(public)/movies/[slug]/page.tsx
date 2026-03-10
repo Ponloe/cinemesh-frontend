@@ -26,7 +26,7 @@ async function getShowtimes(movieId: number) {
     if (!res.ok) return [];
 
     const data = await res.json();
-    return data.data || [];
+    return data.data || data.Data || [];
   } catch {
     return [];
   }
@@ -186,7 +186,7 @@ export default async function MovieDetailPage({
                     {primeShowtimes.length > 0 && (
                       <Link
                         href={`/movies/${slug}/showtimes?provider=Prime`}
-                        className="block p-3 rounded-lg hover:bg-zinc-800 transition-colors group border-t border-zinc-700 pt-3"
+                        className="block p-2 rounded-lg hover:bg-zinc-800 transition-colors group border-zinc-700"
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <Image
