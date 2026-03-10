@@ -1,5 +1,5 @@
 // Core Backend API Utility
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export async function apiRequest<T>(
     endpoint: string,
