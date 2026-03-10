@@ -46,7 +46,7 @@ export default function ForumIndexPage() {
           const firstTopicSlug = topicsArray[0].slug;
           const threadsData = await getThreadsByTopic(firstTopicSlug, { 
             page: 1, 
-            limit: 3 
+            limit: 10
           });
           console.log('Threads Data:', threadsData);
           
