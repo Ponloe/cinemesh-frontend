@@ -202,7 +202,16 @@ export default function ShowtimesClient({
             }, new Map<string, string[]>())
           ).map(([language, times]) => ({
             language,
-            times: [...new Set(times)],
+            times: [...new Set(times)].sort((a, b) => {
+              const toMinutes = (t: string) => {
+                const [time, period] = t.split(" ");
+                let [h, m] = time.split(":").map(Number);
+                if (period === "PM" && h !== 12) h += 12;
+                if (period === "AM" && h === 12) h = 0;
+                return h * 60 + m;
+              };
+              return toMinutes(a) - toMinutes(b);
+            }),
           })),
         })),
     }));
@@ -365,10 +374,10 @@ export default function ShowtimesClient({
                                     <button
                                       key={time}
                                       className={`px-4 py-2 rounded-full border-2 transition-all ${cinema.provider
-                                          .toLowerCase()
-                                          .includes("legend")
-                                          ? "border-zinc-700 text-zinc-200 hover:border-red-500 hover:bg-red-500/10"
-                                          : "border-zinc-700 text-zinc-200 hover:border-blue-500 hover:bg-blue-500/10"
+                                        .toLowerCase()
+                                        .includes("legend")
+                                        ? "border-zinc-700 text-zinc-200 hover:border-red-500 hover:bg-red-500/10"
+                                        : "border-zinc-700 text-zinc-200 hover:border-blue-500 hover:bg-blue-500/10"
                                         }`}
                                     >
                                       {time}
