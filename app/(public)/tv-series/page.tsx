@@ -110,7 +110,7 @@ export default function TVSeriesPage() {
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:gap-5">
               {TV_SERIES.map((series) => (
-                <MovieCard key={series.id} movie={series} />
+                <MovieCard key={series.id} movie={series as any} />
               ))}
             </div>
           </main>
