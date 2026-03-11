@@ -7,7 +7,9 @@ import type { Metadata } from "next";
 import { getMovie } from "@/lib/movies-api";
 import { getFullStreamingData } from "@/lib/streaming-api";
 
-const CORE_API = process.env.NEXT_PUBLIC_API_URL?.replace("/api/public", "") || "http://localhost:8080";
+const CORE_API =
+  process.env.NEXT_PUBLIC_API_URL?.replace("/api/public", "") ||
+  "http://localhost:8080";
 
 const FALLBACK_POSTER =
   "https://placehold.co/500x750/1a1a1a/666666?text=No+Poster";
@@ -55,9 +57,6 @@ export default async function MovieDetailPage({
 }) {
   const { slug } = await params;
 
-  console.log("=== MOVIE PAGE DEBUG ===");
-  console.log("Requested slug:", slug);
-
   let movie;
   try {
     movie = await getMovie(slug);
@@ -72,7 +71,7 @@ export default async function MovieDetailPage({
     notFound();
   }
 
-const showtimes = await getShowtimes(movie.id);
+  const showtimes = await getShowtimes(movie.id);
 
   // Get streaming data from streaming API (watch links, trailer, providers)
   console.log("Fetching streaming data for movie:", {
@@ -86,40 +85,40 @@ const showtimes = await getShowtimes(movie.id);
   const trailerUrl = streamingData.trailer_url || movie.trailer_url;
   const streamingProviders = streamingData.streaming_providers;
 
-// Get today's date string in ICT (UTC+7)
-const nowUTC = new Date();
-const ictOffset = 7 * 60 * 60 * 1000;
-const nowICT = new Date(nowUTC.getTime() + ictOffset);
-const todayStr = nowICT.toISOString().split("T")[0]; // YYYY-MM-DD
+  // Get today's date string in ICT (UTC+7)
+  const nowUTC = new Date();
+  const ictOffset = 7 * 60 * 60 * 1000;
+  const nowICT = new Date(nowUTC.getTime() + ictOffset);
+  const todayStr = nowICT.toISOString().split("T")[0];
 
-const legendMap: Record<string, string[]> = {};
-const primeMap: Record<string, string[]> = {};
+  const legendMap: Record<string, string[]> = {};
+  const primeMap: Record<string, string[]> = {};
 
-for (const s of showtimes) {
-  const cinemaName = s.cinema?.name || "Unknown";
-  const providerName = s.cinema?.provider?.name || "";
+  for (const s of showtimes) {
+    const cinemaName = s.cinema?.name || "Unknown";
+    const providerName = s.cinema?.provider?.name || "";
 
-  // Convert start_time to ICT date
-  const startUTC = new Date(s.start_time);
-  const startICT = new Date(startUTC.getTime() + ictOffset);
-  const startDateStr = startICT.toISOString().split("T")[0];
+    // Convert start_time to ICT date
+    const startUTC = new Date(s.start_time);
+    const startICT = new Date(startUTC.getTime() + ictOffset);
+    const startDateStr = startICT.toISOString().split("T")[0];
 
-  // Only include today's showtimes
-  if (startDateStr !== todayStr) continue;
+    // Only include today's showtimes
+    if (startDateStr !== todayStr) continue;
 
-  const time = startICT.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+    const time = startICT.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-  if (providerName.toLowerCase().includes("legend")) {
-    if (!legendMap[cinemaName]) legendMap[cinemaName] = [];
-    legendMap[cinemaName].push(time);
-  } else if (providerName.toLowerCase().includes("prime")) {
-    if (!primeMap[cinemaName]) primeMap[cinemaName] = [];
-    primeMap[cinemaName].push(time);
+    if (providerName.toLowerCase().includes("legend")) {
+      if (!legendMap[cinemaName]) legendMap[cinemaName] = [];
+      legendMap[cinemaName].push(time);
+    } else if (providerName.toLowerCase().includes("prime")) {
+      if (!primeMap[cinemaName]) primeMap[cinemaName] = [];
+      primeMap[cinemaName].push(time);
+    }
   }
-}
   const legendShowtimes = Object.entries(legendMap).map(([name, times]) => ({
     cinemaName: name,
     times,
@@ -157,9 +156,9 @@ for (const s of showtimes) {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-8">
             {/* LEFT COLUMN */}
-            <div className="shrink-0 flex gap-3 md:flex-col md:gap-0 md:space-y-6">
+            <div className="shrink-0 flex flex-col md:gap-2 md:space-y-6 items-center md:items-start">
               {/* Poster */}
-              <div className="w-28 sm:w-32 md:w-64 shrink-0 overflow-hidden rounded-xl shadow-2xl ring-1 ring-zinc-800">
+              <div className="w-52 md:w-64 shrink-0 overflow-hidden rounded-xl shadow-2xl ring-1 ring-zinc-800 mb-6 md:mb-0">
                 <Image
                   src={posterUrl}
                   alt={`${movie.title} poster`}
@@ -170,14 +169,14 @@ for (const s of showtimes) {
                 />
               </div>
 
-              <div className="flex-1 md:flex-none space-y-3 md:space-y-6">
+              <div className="w-full space-y-2 md:space-y-4">
                 {/* Watch Options */}
                 <div>
                   <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
                     Where To Watch
                   </h3>
 
-                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-3 md:p-4 md:w-64 space-y-4">
+                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-3 md:p-4 w-full md:w-64 space-y-4">
                     {/* Streaming Providers */}
                     {streamingProviders && streamingProviders.length > 0 && (
                       <div>
@@ -273,61 +272,71 @@ for (const s of showtimes) {
                   </div>
                 </div>
 
-{/* NOW SHOWING */}
-<div>
-  <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
-    Now Showing
-  </h3>
+                {/* NOW SHOWING */}
+                <div>
+                  <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
+                    Now Showing
+                  </h3>
 
-  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-2 md:p-4 md:w-64 space-y-1">
-    {legendShowtimes.length > 0 && (
-<Link
-  href={`/movies/${slug}/showtimes?provider=Legend`}
-  className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-800 transition-colors group min-h-[56px]"
->
-        <Image
-          src="https://www.legend.com.kh/_ipx/s_117x44/legend-cinema-logo.png"
-          alt="Legend Cinema"
-          width={55}
-          height={20}
-          unoptimized
-        />
-        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
-          {legendShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} today →
-        </p>
-      </Link>
-    )}
+                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-2 md:p-4 w-full md:w-64 space-y-1">
+                    {legendShowtimes.length > 0 && (
+                      <Link
+                        href={`/movies/${slug}/showtimes?provider=Legend`}
+                        className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-800 transition-colors group min-h-14"
+                      >
+                        <Image
+                          src="https://www.legend.com.kh/_ipx/s_117x44/legend-cinema-logo.png"
+                          alt="Legend Cinema"
+                          width={55}
+                          height={20}
+                          unoptimized
+                        />
+                        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
+                          {legendShowtimes.reduce(
+                            (total, cinema) => total + cinema.times.length,
+                            0,
+                          )}{" "}
+                          today →
+                        </p>
+                      </Link>
+                    )}
 
-    {legendShowtimes.length > 0 && primeShowtimes.length > 0 && (
-      <div className="border-t border-zinc-800 mx-3" />
-    )}
+                    {legendShowtimes.length > 0 &&
+                      primeShowtimes.length > 0 && (
+                        <div className="border-t border-zinc-800 mx-3" />
+                      )}
 
-    {primeShowtimes.length > 0 && (
-<Link
-  href={`/movies/${slug}/showtimes?provider=Prime`}
-  className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-800 transition-colors group min-h-[56px]"
->
-        <Image
-          src="https://primecineplex.com/Assets/exolutus/css/images/PrimeLogo.png"
-          alt="Prime Cineplex"
-          width={55}
-          height={20}
-          unoptimized
-          className="brightness-0 invert"
-        />
-        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
-          {primeShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} today →
-        </p>
-      </Link>
-    )}
+                    {primeShowtimes.length > 0 && (
+                      <Link
+                        href={`/movies/${slug}/showtimes?provider=Prime`}
+                        className="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-800 transition-colors group min-h-14"
+                      >
+                        <Image
+                          src="https://primecineplex.com/Assets/exolutus/css/images/PrimeLogo.png"
+                          alt="Prime Cineplex"
+                          width={55}
+                          height={20}
+                          unoptimized
+                          className="brightness-0 invert"
+                        />
+                        <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
+                          {primeShowtimes.reduce(
+                            (total, cinema) => total + cinema.times.length,
+                            0,
+                          )}{" "}
+                          today →
+                        </p>
+                      </Link>
+                    )}
 
-    {legendShowtimes.length === 0 && primeShowtimes.length === 0 && (
-      <p className="text-xs text-zinc-500 p-3">
-        No showtimes available
-      </p>
-    )}
-  </div>
-</div>
+                    {legendShowtimes.length === 0 &&
+                      primeShowtimes.length === 0 && (
+                        <p className="text-xs text-zinc-500 p-3">
+                          No showtimes available
+                        </p>
+                      )}
+                  </div>
+                </div>
               </div>
             </div>
 
