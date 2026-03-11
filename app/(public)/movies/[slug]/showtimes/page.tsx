@@ -6,7 +6,7 @@ import { getMovie } from "@/lib/movies-api";
 import Link from "next/link";
 import ShowtimesClient from "./showtimes-client";
 
-const CORE_API = process.env.NEXT_PUBLIC_CORE_API_URL || "http://localhost:8080";
+const CORE_API = process.env.NEXT_PUBLIC_API_URL?.replace("/api/public", "") || "http://localhost:8080";
 
 async function getShowtimes(movieId: number) {
   try {
