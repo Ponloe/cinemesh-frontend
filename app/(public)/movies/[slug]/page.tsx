@@ -5,22 +5,21 @@ import { Footer } from "@/components/footer";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getMovie } from "@/lib/movies-api";
+import { getFullStreamingData } from "@/lib/streaming-api";
 
-const CORE_API = process.env.NEXT_PUBLIC_CORE_API_URL || "http://localhost:8080";
+const CORE_API =
+  process.env.NEXT_PUBLIC_CORE_API_URL || "http://localhost:8080";
 
-const STREAMING_SERVICES = [
-  { name: "Netflix", available: true, logo: "N" },
-  { name: "Apple TV", available: true, logo: "" },
-];
-
-const FALLBACK_POSTER = "https://placehold.co/500x750/1a1a1a/666666?text=No+Poster";
-const FALLBACK_BACKDROP = "https://placehold.co/1920x1080/1a1a1a/666666?text=No+Backdrop";
+const FALLBACK_POSTER =
+  "https://placehold.co/500x750/1a1a1a/666666?text=No+Poster";
+const FALLBACK_BACKDROP =
+  "https://placehold.co/1920x1080/1a1a1a/666666?text=No+Backdrop";
 
 async function getShowtimes(movieId: number) {
   try {
     const res = await fetch(
       `${CORE_API}/api/public/movies/${movieId}/showtimes`,
-      { cache: "no-store" }
+      { cache: "no-store" },
     );
 
     if (!res.ok) return [];
@@ -57,14 +56,36 @@ export default async function MovieDetailPage({
 }) {
   const { slug } = await params;
 
+  console.log("=== MOVIE PAGE DEBUG ===");
+  console.log("Requested slug:", slug);
+
   let movie;
   try {
     movie = await getMovie(slug);
-  } catch {
+    console.log("Received movie:", {
+      id: movie.id,
+      title: movie.title,
+      slug: movie.slug,
+      tmdb_id: movie.tmdb_id,
+    });
+  } catch (error) {
+    console.error("Failed to fetch movie:", error);
     notFound();
   }
 
   const showtimes = await getShowtimes(movie.id);
+
+  // Get streaming data from streaming API (watch links, trailer, providers)
+  console.log("Fetching streaming data for movie:", {
+    title: movie.title,
+    tmdb_id: movie.tmdb_id,
+  });
+  const streamingData = await getFullStreamingData(movie.title, movie.tmdb_id);
+
+  // Use streaming API data if available, fallback to core API data
+  const watchLink = streamingData.watch_link || movie.watch_link;
+  const trailerUrl = streamingData.trailer_url || movie.trailer_url;
+  const streamingProviders = streamingData.streaming_providers;
 
   const legendMap: Record<string, string[]> = {};
   const primeMap: Record<string, string[]> = {};
@@ -116,16 +137,14 @@ export default async function MovieDetailPage({
           priority
           unoptimized
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-zinc-950/40 to-zinc-950" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-zinc-950/40 to-zinc-950" />
       </div>
 
       <div className="container mx-auto px-4 -mt-32 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-8">
-
             {/* LEFT COLUMN */}
             <div className="shrink-0 flex gap-3 md:flex-col md:gap-0 md:space-y-6">
-
               {/* Poster */}
               <div className="w-28 sm:w-32 md:w-64 shrink-0 overflow-hidden rounded-xl shadow-2xl ring-1 ring-zinc-800">
                 <Image
@@ -139,20 +158,105 @@ export default async function MovieDetailPage({
               </div>
 
               <div className="flex-1 md:flex-none space-y-3 md:space-y-6">
-
-                {/* Streaming */}
+                {/* Watch Options */}
                 <div>
                   <h3 className="text-sm md:text-lg font-semibold mb-1.5 md:mb-3 text-white">
-                    Stream It Now
+                    Where To Watch
                   </h3>
 
-                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-2 md:p-4 md:w-64">
-                    {STREAMING_SERVICES.map((service) => (
-                      <div key={service.name} className="flex items-center justify-between py-1.5 md:py-2">
-                        <span className="text-xs md:text-base text-zinc-300">{service.name}</span>
-                        <span className="text-red-500 font-bold text-sm md:text-lg">{service.logo}</span>
+                  <div className="bg-zinc-900/50 backdrop-blur-sm rounded-lg md:rounded-xl border border-zinc-800 p-3 md:p-4 md:w-64 space-y-4">
+                    {/* Streaming Providers */}
+                    {streamingProviders && streamingProviders.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-zinc-400 mb-3 uppercase tracking-wide">
+                          Stream
+                        </p>
+                        <div className="space-y-2">
+                          {streamingProviders
+                            .filter((p) => p.type === "flatrate")
+                            .map((provider) => (
+                              <a
+                                key={provider.id}
+                                href={provider.link || watchLink || "#"}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-zinc-800/50 transition-colors group"
+                              >
+                                <span className="text-sm text-zinc-200 group-hover:text-white font-medium">
+                                  {provider.provider_name}
+                                </span>
+                              </a>
+                            ))}
+                        </div>
                       </div>
-                    ))}
+                    )}
+                    {/* Rent */}
+                    {streamingProviders &&
+                      streamingProviders.some((p) => p.type === "rent") && (
+                        <div>
+                          <p className="text-xs font-semibold text-zinc-400 mb-3 uppercase tracking-wide">
+                            Rent
+                          </p>
+                          <div className="space-y-2">
+                            {streamingProviders
+                              .filter((p) => p.type === "rent")
+                              .map((provider) => (
+                                <a
+                                  key={provider.id}
+                                  href={provider.link || watchLink || "#"}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-zinc-800/50 transition-colors group"
+                                >
+                                  <span className="text-sm text-zinc-200 group-hover:text-white font-medium">
+                                    {provider.provider_name}
+                                  </span>
+                                </a>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+                    {/* Buy */}
+                    {streamingProviders &&
+                      streamingProviders.some((p) => p.type === "buy") && (
+                        <div>
+                          <p className="text-xs font-semibold text-zinc-400 mb-3 uppercase tracking-wide">
+                            Buy
+                          </p>
+                          <div className="space-y-2">
+                            {streamingProviders
+                              .filter((p) => p.type === "buy")
+                              .map((provider) => (
+                                <a
+                                  key={provider.id}
+                                  href={provider.link || watchLink || "#"}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-zinc-800/50 transition-colors group"
+                                >
+                                  <span className="text-sm text-zinc-200 group-hover:text-white font-medium">
+                                    {provider.provider_name}
+                                  </span>
+                                </a>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+                    {/* Trailer */}
+                    {trailerUrl && (
+                      <div>
+                        <a
+                          href={trailerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-red-600 hover:bg-red-700 transition-colors w-full"
+                        >
+                          <span className="text-sm text-white font-semibold">
+                            ▶ Watch Trailer
+                          </span>
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -178,7 +282,11 @@ export default async function MovieDetailPage({
                           />
                         </div>
                         <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
-                          {legendShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} showtimes
+                          {legendShowtimes.reduce(
+                            (total, cinema) => total + cinema.times.length,
+                            0,
+                          )}{" "}
+                          showtimes
                         </p>
                       </Link>
                     )}
@@ -198,25 +306,28 @@ export default async function MovieDetailPage({
                           />
                         </div>
                         <p className="text-xs text-zinc-400 group-hover:text-zinc-300">
-                          {primeShowtimes.reduce((total, cinema) => total + cinema.times.length, 0)} showtimes
+                          {primeShowtimes.reduce(
+                            (total, cinema) => total + cinema.times.length,
+                            0,
+                          )}{" "}
+                          showtimes
                         </p>
                       </Link>
                     )}
 
-                    {legendShowtimes.length === 0 && primeShowtimes.length === 0 && (
-                      <p className="text-xs text-zinc-500">
-                        No showtimes available
-                      </p>
-                    )}
+                    {legendShowtimes.length === 0 &&
+                      primeShowtimes.length === 0 && (
+                        <p className="text-xs text-zinc-500">
+                          No showtimes available
+                        </p>
+                      )}
                   </div>
                 </div>
-
               </div>
             </div>
 
             {/* RIGHT COLUMN */}
             <div className="flex-1 text-white">
-
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
                 {movie.title}
               </h1>
@@ -289,9 +400,7 @@ export default async function MovieDetailPage({
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
                     {cast.slice(0, 12).map((castMember) => (
                       <div key={castMember.id} className="text-center">
-
                         <div className="w-20 h-20 mx-auto mb-2 rounded-full overflow-hidden bg-zinc-800 ring-2 ring-zinc-700">
-
                           {castMember.profile_path ? (
                             <Image
                               src={castMember.profile_path}
@@ -306,7 +415,6 @@ export default async function MovieDetailPage({
                               {castMember.name.charAt(0).toUpperCase()}
                             </div>
                           )}
-
                         </div>
 
                         <p className="text-sm font-medium text-zinc-200 truncate">
@@ -318,27 +426,12 @@ export default async function MovieDetailPage({
                             {castMember.character}
                           </p>
                         )}
-
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
-              {/* Reviews */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold">Reviews</h3>
-                  <span className="text-sm text-zinc-500">Coming soon</span>
-                </div>
-
-                <div className="bg-zinc-900/50 backdrop-blur-sm rounded-xl border border-zinc-800 p-8 text-center">
-                  <p className="text-zinc-400">Reviews feature coming soon</p>
-                </div>
-              </div>
-
             </div>
-
           </div>
         </div>
       </div>
