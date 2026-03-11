@@ -11,7 +11,7 @@ export function Footer() {
               </p>
             </div>
             <p className="text-sm text-zinc-600">
-              © 2025 CineMesh. Mock data for demonstration.
+              © 2026 CineMesh.
             </p>
           </div>
         </div>

@@ -33,7 +33,7 @@ export default function UserProfile({ params }: { params: { username: string } }
         <div className="max-w-3xl mx-auto">
           <div className="rounded-2xl bg-white/5 p-8 backdrop-blur-xl border border-white/10">
             <div className="flex items-center gap-6 mb-8">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-pink-600 flex items-center justify-center text-white text-4xl font-bold">
+              <div className="w-24 h-24 rounded-full bg-linear-to-br from-orange-500 to-pink-600 flex items-center justify-center text-white text-4xl font-bold">
                 {user.username?.[0]?.toUpperCase() ?? "?"}
               </div>
               <div>
