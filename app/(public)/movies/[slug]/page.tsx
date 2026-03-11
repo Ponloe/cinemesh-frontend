@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getMovie } from "@/lib/movies-api";
 
-const CORE_API = process.env.NEXT_PUBLIC_CORE_API_URL || "http://localhost:8080";
+const CORE_API = process.env.NEXT_PUBLIC_API_URL?.replace("/api/public", "") || "http://localhost:8080";
 
 const STREAMING_SERVICES = [
   { name: "Netflix", available: true, logo: "N" },
