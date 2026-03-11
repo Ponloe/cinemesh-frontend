@@ -1,6 +1,14 @@
 import { API_CONFIG, DEFAULT_PAGE_SIZE } from './constants';
 import type { PaginationParams, PaginatedResponse } from './types';
 
+function normalizeUrl(url: string | null | undefined): string | undefined {
+    if (!url) return undefined;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    return `https://${url}`;
+}
+
 export interface MovieGenre {
     id: number;
     name: string;
@@ -30,6 +38,8 @@ export interface Movie {
     cast?: CastMember[];
     director?: string;
     year?: number;
+    watch_link?: string;
+    trailer_url?: string;
 }
 
 export interface MoviesListParams extends PaginationParams {
@@ -79,6 +89,8 @@ interface ApiMovie {
     CreatedAt: string;
     Genres?: ApiMovieGenre[];
     Cast?: ApiCastMember[];
+    watch_link?: string;
+    trailer_url?: string;
 }
 
 interface ApiPaginatedResponse<T> {
@@ -133,6 +145,8 @@ function transformMovie(apiMovie: ApiMovie): Movie {
         cast: apiMovie.Cast?.filter(c => c.role === 'Actor').map(transformCast) || [],
         director,
         year: new Date(apiMovie.ReleaseDate).getFullYear(),
+        watch_link: normalizeUrl(apiMovie.watch_link),
+        trailer_url: normalizeUrl(apiMovie.trailer_url),
     };
 }
 
@@ -140,7 +154,10 @@ async function moviesRequest<T>(
     endpoint: string,
     options?: RequestInit
 ): Promise<T> {
-    const response = await fetch(`${API_CONFIG.BASE_API}${endpoint}`, {
+    const url = `${API_CONFIG.BASE_API}${endpoint}`;
+    console.log('→ API Request:', url);
+    
+    const response = await fetch(url, {
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -157,7 +174,8 @@ async function moviesRequest<T>(
         throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    return data;
 }
 
 function buildQueryString(params: Record<string, any>): string {
