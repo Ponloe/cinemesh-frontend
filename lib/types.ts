@@ -126,6 +126,7 @@ export interface CreateThreadRequest {
     title: string;
     content: string;
     movie_id?: number;
+    movie_title?: string;
     tags?: string[];
 }
 
@@ -148,4 +149,10 @@ export interface UpdateReplyRequest {
 
 export interface ThreadListParams extends PaginationParams {
     topicSlug?: string;
+}
+
+export interface CreateMovieReviewRequest {
+    content: string;
+    title?: string;
+    tags?: string[];
 }

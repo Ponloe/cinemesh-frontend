@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getMovie } from "@/lib/movies-api";
 import { getFullStreamingData } from "@/lib/streaming-api";
+import { MovieReviews } from "@/components/movies/movie-reviews";
 
 const CORE_API =
   process.env.NEXT_PUBLIC_API_URL?.replace("/api/public", "") ||
@@ -445,6 +446,7 @@ export default async function MovieDetailPage({
                   </div>
                 </div>
               )}
+              <MovieReviews movieId={movie.id} movieTitle={movie.title} />
             </div>
           </div>
         </div>
