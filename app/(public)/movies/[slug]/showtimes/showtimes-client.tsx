@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
 interface ShowtimeData {
@@ -18,10 +19,15 @@ interface ShowtimeData {
   };
 }
 
+interface ShowtimeTimeItem {
+  id?: number;
+  time: string;
+}
+
 interface CinemaGroup {
   name: string;
   provider: string;
-  times: string[];
+  times: ShowtimeTimeItem[];
 }
 
 interface ShowtimesClientProps {
@@ -35,6 +41,7 @@ export default function ShowtimesClient({
   movieSlug,
   providerParam,
 }: ShowtimesClientProps) {
+  const router = useRouter();
   const [expandedCinemas, setExpandedCinemas] = useState<Set<string>>(new Set());
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("");
@@ -128,13 +135,16 @@ export default function ShowtimesClient({
         };
       }
 
-      cinemaMap[key].times.push(time);
+      cinemaMap[key].times.push({
+        id: s.id,
+        time,
+      });
     }
 
     return Object.values(cinemaMap)
       .map((cinema) => ({
         ...cinema,
-        times: [...new Set(cinema.times)].sort((a, b) => {
+        times: [...cinema.times].sort((a, b) => {
           const toMinutes = (t: string) => {
             const [time, period] = t.split(" ");
             let [h, m] = time.split(":").map(Number);
@@ -145,7 +155,7 @@ export default function ShowtimesClient({
             return h * 60 + m;
           };
 
-          return toMinutes(a) - toMinutes(b);
+          return toMinutes(a.time) - toMinutes(b.time);
         }),
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -266,14 +276,28 @@ export default function ShowtimesClient({
               {expanded && (
                 <div className="bg-zinc-950/80 px-6 py-6 border-t border-zinc-800">
                   <div className="flex flex-wrap gap-2">
-                    {cinema.times.map((time) => (
-                      <button
-                        key={time}
-                        className="px-4 py-2 rounded-full border border-zinc-700 text-zinc-200 hover:border-red-500 hover:bg-red-500/10"
-                      >
-                        {time}
-                      </button>
-                    ))}
+                    {cinema.times.map((item) => {
+                      const disabled = !item.id;
+                      return (
+                        <button
+                          key={`${cinema.name}-${item.time}-${item.id ?? "noid"}`}
+                          disabled={disabled}
+                          onClick={() => {
+                            if (!item.id) return;
+                            router.push(
+                              `/movies/${movieSlug}/showtimes/${item.id}/seats`
+                            );
+                          }}
+                          className={`px-4 py-2 rounded-full border text-sm ${
+                            disabled
+                              ? "border-zinc-800 text-zinc-600 cursor-not-allowed"
+                              : "border-zinc-700 text-zinc-200 hover:border-red-500 hover:bg-red-500/10"
+                          }`}
+                        >
+                          {item.time}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

@@ -1,22 +1,32 @@
 // Core Backend API Utility
-const API_BASE_URL = process.env.NEXT_PUBLIC_AUTH_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_AUTH_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:8080";
 
 export async function apiRequest<T>(
-    endpoint: string,
-    options?: RequestInit
+  endpoint: string,
+  options?: RequestInit
 ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
+      "Content-Type": "application/json",
+      ...options?.headers,
     },
-    credentials: 'include', // cookiessss
+    credentials: "include", // send cookies
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    const errorBody = await response
+      .json()
+      .catch(() => ({ error: "An error occurred" }));
+
+    const message =
+      (errorBody && (errorBody.error || errorBody.message)) ||
+      `HTTP error! status: ${response.status}`;
+
+    throw new Error(message);
   }
 
   return response.json();
