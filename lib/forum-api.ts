@@ -13,6 +13,7 @@ import type {
     UpdateThreadRequest,
     CreateReplyRequest,
     UpdateReplyRequest,
+    CreateMovieReviewRequest,
 } from './types';
 
 async function forumRequest<T>(
@@ -181,6 +182,41 @@ export async function deleteThread(slug: string): Promise<void> {
     return forumRequest<void>(`/threads/${slug}`, {
         method: 'DELETE',
     });
+}
+
+type ReviewMovieInput = {
+    id: number;
+    title: string;
+    slug: string;
+};
+
+export async function getMovieReviews(
+    movieId: number,
+    params?: PaginationParams
+): Promise<PaginatedResponse<ForumThread>> {
+    const query = buildQueryString({
+        page: params?.page || 1,
+        limit: params?.limit || DEFAULT_PAGE_SIZE,
+    });
+
+    return forumRequest<PaginatedResponse<ForumThread>>(
+        `/movies/${movieId}/reviews${query}`
+    );
+}
+
+export async function createMovieReview(
+    movie: ReviewMovieInput,
+    content: string
+): Promise<ForumThread> {
+    const payload: CreateThreadRequest = {
+        title: `Review: ${movie.title}`,
+        content,
+        movie_id: movie.id,
+        movie_title: movie.title, 
+        tags: ['review', movie.slug],
+    };
+
+    return createThread('reviews', payload);
 }
 
 // ==================== REPLIES ====================
